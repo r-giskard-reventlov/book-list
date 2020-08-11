@@ -1,0 +1,5 @@
+data-extraction/dumps
+data-extraction/indexes
+*.pyc
+book-list/target
+*.class
