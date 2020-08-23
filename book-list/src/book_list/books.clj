@@ -5,17 +5,13 @@
             [cheshire.core :refer :all]))
 
 
-(def accounts {"justin" {"2020 books" [{:title "The way of Kings" :author "Brandon Sanderson"}
-                                       {:title "The name of the Wind" :author "Patrick Rothfuss"}]
-                         "2019 books" [{:title "Foundation" :author "Isaac Asimov"}]}
-               "iain" {"My Favourite books" [{:title "The way of Kings"}]}})
-
 (def works-by-keyword
-  (let [works (parse-stream (clojure.java.io/reader "/home/justin/Storage/Development/book-list-project/data-extraction/works-lowercase.ix"))]
+  (let [works (parse-stream (clojure.java.io/reader "/home/justin/Storage/Development/book-list-project/data-extraction/indexes/works-by-keyword.ix"))]
     works))
 
 (def works-by-id
-  (let [works (parse-stram (clojure.java.io/reader "/home/justin/Storage/Development/book-list-project/data-extraction/works-by-id.ix"))]))
+  (let [works (parse-stream (clojure.java.io/reader "/home/justin/Storage/Development/book-list-project/data-extraction/indexes/works-by-id.ix"))]
+    works))
 
 (defn render-page
   "Render a page including any partials"
@@ -37,16 +33,26 @@
                     :name "Justin Wilson"}
                    [:header :footer])))
 
-(defn lists-for-account [account]
-  (let [account-list (get accounts account)]
-    (do (println (str "Returning lists for " account " " account-list)))
-        account-list))
+(defn works-obj [works-id]
+  (let [works (get works-by-id works-id)]
+    works))
 
 (defn works-by-word [word]
   (let [works-for-word (get works-by-keyword word)]
     (set works-for-word)))
 
-(defn search [title-words]
-  (let [work-ids (map works-by-word title-words)]
-    (apply clojure.set/intersection work-ids)))
+
+;; still need to remove stopwords
+(defn search [keywords]
+  (let [
+        ;; lower-case-keywords (do (println (str "keywords> " keywords)) (map clojure.string/lower-case keywords))
+        work-ids (map works-by-word keywords)
+        unique-works-ids (apply clojure.set/intersection work-ids)
+        works (map works-obj unique-works-ids)]
+    (do
+      ;; (println lower-case-keywords)
+      (println (str "ids > " work-ids))
+      (println (str "unique > " unique-works-ids))
+      (println (str "works > " works))
+      works)))
 

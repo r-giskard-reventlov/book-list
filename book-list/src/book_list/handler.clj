@@ -1,21 +1,21 @@
 (ns book-list.handler
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
-            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
+            ;; [compojure.route :as route]
+            ;; [ring.middleware.defaults :refer [wrap-defaults site-defaults api-defaults]]
             [book-list.books :as books]
-            [ring.util.response :as r]
-            [clojure.data.json :as json]))
+            [ring.util.response :refer :all]
+            [ring.middleware.json :refer :all]
+            ;; [clojure.data.json :as json]
+            ))
 
 
 (defroutes app-routes
-  (GET "/account/:account/lists" [account]
-       (let [resp (-> (r/response (json/write-str (books/lists-for-account account)))
-                      (r/status 200)
-                      (r/header "Content-Type" "application/json"))]
-         resp))
   (GET "/" [] (books/home))
-  (route/not-found "Not Found"))
-
+  (POST "/api/works" {body :body} (response (books/search (get body "keywords"))))
+  (route/resources "/"))
 
 (def app
-  (wrap-defaults app-routes site-defaults))
+  (-> (wrap-json-response app-routes)
+      (wrap-json-body)
+      (wrap-json-response)))

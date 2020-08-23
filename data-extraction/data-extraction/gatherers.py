@@ -29,8 +29,8 @@ def gatherer_by_id(response_q):
     try:
         with jsonstreams.Stream(jsonstreams.Type.object, filename='works-by-id.ix') as s:
             while True:
-                works_id, works_json = response_q.get(block=True, timeout=5)
-                s.write(works_id, works_json)
+                works_id, extracted_data = response_q.get(block=True, timeout=5)
+                s.write(works_id, extracted_data)
     except Empty:
         print('Ended gathering worker')
     except Exception as e:
