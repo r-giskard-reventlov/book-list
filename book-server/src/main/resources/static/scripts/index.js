@@ -6,37 +6,39 @@ import Header from './views/components/Header.js';
 import Footer from './views/components/Footer.js';
 import Sidebar from './views/components/SideBar.js';
 import BookSearch from './views/components/BookSearch.js';
+import ListView from "./views/pages/ListView.js";
 import Utils from './services/Utils.js';
+
 
 const routes = {
     '/': Home,
-    // '/patient/:id' : Patient
+    '/lists/:id' : ListView
 };
 
 
 const router = async () => {
-    const header = null || document.getElementById('header-container');
-    // const sidebar = null || document.getElementById('sidebar');
-    const content = null || document.getElementById('page-container');
-    const footer = null || document.getElementById('footer-container');
+    const header = document.getElementById('header-container');
+    const sidebar = document.getElementById('sidebar');
+    const content = document.getElementById('page-container');
+    const footer = document.getElementById('footer-container');
 
-    
     header.innerHTML = await Header.render();
-    await Header.after_render();
-
     footer.innerHTML = await Footer.render();
-    await Footer.after_render();
 
     const request = Utils.parseRequestURL()
     const parsedURL = (request.resource ? '/' + request.resource : '/') + (request.id ? '/:id' : '') + (request.verb ? '/' + request.verb : '')
     const page = routes[parsedURL] ? routes[parsedURL] : Error404
-    content.innerHTML =  await Sidebar.render();
-    content.innerHTML += await page.render();
+
+    sidebar.innerHTML = await Sidebar.render('justin');
+    content.innerHTML = await page.render();
+
+    await Header.after_render();
+    await Footer.after_render();
+    await Sidebar.after_render('justin');
     await page.after_render();
 }
 
 window.addEventListener('hashchange', router);
 window.addEventListener('load', router);
 
-// customElements.define('proxy-permissions', Proxy);
 customElements.define('book-search', BookSearch);

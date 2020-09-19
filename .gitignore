@@ -1,5 +1,12 @@
+.idea
+book-server/target
+book-server/.idea
 data-extraction/dumps
 data-extraction/indexes
 *.pyc
 book-list/target
 *.class
+*.err
+**/.#*
+books/data
+books/rejson

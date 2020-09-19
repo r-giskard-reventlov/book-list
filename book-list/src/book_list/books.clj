@@ -31,7 +31,9 @@
       (render-page "home"
                    {:title "Books"
                     :name "Justin Wilson"}
-                   [:header :footer])))
+                   ;;[:header :footer]
+                   []
+                   )))
 
 (defn works-obj [works-id]
   (let [works (get works-by-id works-id)]

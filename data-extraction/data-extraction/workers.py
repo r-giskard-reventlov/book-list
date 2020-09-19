@@ -49,10 +49,14 @@ def worker_by_id(job_q, response_q, error_q, ix):
                         extracted['covers'] = works_json['covers']
                     if 'authors' in works_json and len(works_json['authors']) > 0:
                         extracted['authors'] = [a['author']['key'] for a in works_json['authors'] if 'author' in a]
-                    if 'description' in works_json and 'value' in works_json['description']: # and works_json['description']['type'] == '/type/text':
+                    if 'description' in works_json and isinstance(works_json['description'], str):
+                        extracted['description'] = works_json['description']
+                    if 'description' in works_json and 'value' in works_json['description']: 
                         extracted['description'] = works_json['description']['value']
                     if 'subjects' in works_json and len(works_json['subjects']) > 0:
                         extracted['subjects'] = works_json['subjects']
+                    if 'first_publish_date' in works_json and len(works_json['first_publish_date']) > 0:
+                        extracted['published'] = works_json['first_publish_date']
                     response_q.put((works_id, extracted), block=True)
             except Empty:
                 raise Empty('nothing left to process')

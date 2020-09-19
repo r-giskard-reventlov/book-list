@@ -1,6 +1,6 @@
 """Usage:
-    extract-works.py by-keyword FILE [ERROR_FILE]
-    extract-works.py by-id FILE [ERROR_FILE]
+    extract-works.py by-keyword FILE (fs|redis) [ERROR_FILE]
+    extract-works.py by-id FILE (file|redis) [ERROR_FILE]
 
 Process a works file from Open library, creating indexed works
 
@@ -8,6 +8,8 @@ Arguments:
   by-keyword  Creates an index of works id's indexed by title keywords
   by-id       Creates an index of works objects indexed by works id
   FILE        Name of Works file to process
+  OUTPUT_FILE Name/path of the output file
+  REDIS       Name of the Redis instance for output
   ERROR_FILE  Name of error file to log errors
 
 Options:
@@ -18,7 +20,7 @@ Options:
 from docopt import docopt
 
 from multiprocessing import Process, Queue, Manager
-from gatherers import gatherer_by_id, gatherer_by_keyword
+from gatherers import gatherer_by_id_fs, gatherer_by_keyword_fs, gatherer_by_id_redis, gatherer_by_keyword_redis
 from workers import worker_by_id, worker_by_keyword
 
 def dispatcher(job_q, works_file):
@@ -51,14 +53,18 @@ if __name__ == '__main__':
 
     error_file = arguments['ERROR_FILE'] or './log.err'
     works_file = arguments['FILE']
-    gatherer = gatherer_by_keyword if arguments['by-keyword'] else gatherer_by_id
+    out = 'file' if arguments['fs'] else 'redis'
+    if out == 'file':
+        gatherer = gatherer_by_keyword_fs if arguments['by-keyword'] else gatherer_by_id_fs
+    else:
+        gatherer = gatherer_by_keyword_redis if arguments['by-keyword'] else gatherer_by_id_redis        
     worker = worker_by_keyword if arguments['by-keyword'] else worker_by_id
     
     process = Process(target=dispatcher, args=(job_q, works_file))
     processes.append(process)
     process.start()
 
-    process = Process(target=gatherer, args=(response_q,))
+    process = Process(target=gatherer, args=(response_q, error_q))
     processes.append(process)
     process.start()
 

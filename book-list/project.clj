@@ -12,7 +12,7 @@
                  [de.ubercode.clostache/clostache "1.4.0"]
                  [org.clojure/data.json "1.0.0"]
                  [cheshire "5.10.0"]]
-  :jvm-opts ["-Xmx13g"]
+  :jvm-opts ["-Xmx6g"]
   :plugins [[lein-ring "0.12.5"]]
   :ring {:handler book-list.handler/app}
   :profiles
